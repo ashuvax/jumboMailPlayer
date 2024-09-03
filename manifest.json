@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "נגן הקבצים של JumboMail",
-    "version": "1.0",
+    "name": "JumboMail Player",
+    "version": "2.0",
     "description": "תוסף לניגון והורדת קבצים מ-JumboMail.",
     "permissions": [
         "activeTab"
@@ -25,5 +25,10 @@
                 "contentScript.js"
             ]
         }
-    ]
+    ],
+    "icons": {
+        "16": "icons/16.png",
+        "48": "icons/48.png",
+        "128": "icons/128.png"
+    }
 }
