@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "נגן הקבצים של JumboMail",
+    "version": "1.0",
+    "description": "תוסף לניגון והורדת קבצים מ-JumboMail.",
+    "permissions": [
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://api.jumbomail.me/*",
+        "https://www.jumbomail.me/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_icon": {}
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.jumbomail.me/l/en/gallery/*"
+            ],
+            "js": [
+                "contentScript.js"
+            ]
+        }
+    ]
+}

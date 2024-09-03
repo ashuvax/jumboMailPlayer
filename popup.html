@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>נגן הקבצים של JumboMail</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>נגן הקבצים של JumboMail</h1>
+    <input type="text" id="linkInput" placeholder="הזן קישור של JumboMail">
+    <button id="fetchFilesButton">קבל קבצים</button> <!-- Remove onclick from here -->
+
+    <div id="fileList"></div>
+
+    <!-- Popup Modal for Media Playback -->
+    <div id="mediaModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <div id="mediaTitle" class="media-title"></div>
+            <div id="mediaContainer"></div>
+            <button id="prevButton">הקודם</button>
+            <button id="nextButton">הבא</button>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>
