@@ -30,6 +30,14 @@ const saveVolume = (volume) => {
 const getVolume = () => {
     return localStorage.getItem('mediaVolume') || 1; // Default volume is 1 (100%)
 }
+// Add event listeners for keyboard navigation
+window.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowRight') {
+        playNext();
+    } else if (event.key === 'ArrowLeft') {
+        playPrev();
+    }
+});
 
 function playNext() {
     let nextIndex = currentIndex + 1;
@@ -165,12 +173,9 @@ const createModal = () => {
             position: relative;
             max-width: 600px; /* Maximum width for content */
         }
-        
-        .modal-fullscreen {
-            width: 100%;
-            height: 100%;
-            max-width: none; /* Remove max-width for fullscreen */
-            max-height: none; /* Remove max-height for fullscreen */
+
+        .modal-content video {
+            max-width: 80%;
         }
 
         .media-title {
@@ -225,14 +230,11 @@ const showModal = (type, src, fileName) => {
         mediaElement.controls = true;
         mediaElement.autoplay = true; // Enable autoplay
         mediaElement.src = src;
-        modal.classList.remove('modal-fullscreen'); // Remove fullscreen for audio
     } else if (type === 'Video') {
         mediaElement = document.createElement('video');
         mediaElement.controls = true;
         mediaElement.autoplay = true; // Enable autoplay
         mediaElement.src = src;
-        mediaElement.style.width = '100%';
-        modal.classList.add('modal-fullscreen'); // Set fullscreen for video
     } else {
         alert('סוג מדיה לא נתמך.');
         return;
@@ -361,9 +363,11 @@ async function fetchVideoLink(fileId) {
                 modalLoad = true;
                 await fetchFiles();
                 let currentFile = null;
-                for (const [index, file] of Object.values(filesData).entries()) {
+                let i = currentIndex;
+                for (i; i < Object.keys(filesData).length; i++) {
+                    const file = filesData[Object.keys(filesData)[i]];
                     if (file.Type === 'Audio' || file.Type === 'Video') {
-                        currentIndex = index;
+                        currentIndex = i;
                         currentFile = file;
                         break;
                     }
