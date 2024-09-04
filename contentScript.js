@@ -32,9 +32,11 @@ const getVolume = () => {
 }
 // Add event listeners for keyboard navigation
 window.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowRight') {
+    if ((event.key === 'ArrowRight' || event.key === 'MediaTrackNext')
+        && hasNext()) {
         playNext();
-    } else if (event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious'
+        && hasPrev()) {
         playPrev();
     }
 });
@@ -207,6 +209,25 @@ const createModal = () => {
             margin: 10px;
             cursor: pointer;
         }
+
+        .spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 8px solid rgba(0, 0, 0, 0.1);
+        border-top: 8px solid #007bff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        z-index: 1001; /* מעל המודל */
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
     `;
     document.head.appendChild(style);
 }
@@ -357,10 +378,21 @@ async function fetchVideoLink(fileId) {
             playButton.src = "https://resources.jumbomail.me/assets/icons/play.svg";
             playButton.classList.add('jm-icon', 'xl-icon', 'gray-icon', 'clickable-icon');
             playButtonWrapper.appendChild(playButton);
+
+            // יצירת אלמנט ספינר
+            const spinner = document.createElement('div');
+            spinner.classList.add('spinner');
+            spinner.style.display = 'none'; // הסתרת הספינר בהתחלה
+            document.body.appendChild(spinner);
+
             playButtonWrapper.onclick = async () => {
 
                 if (modalLoad) return;
                 modalLoad = true;
+
+                // הצגת הספינר
+                spinner.style.display = 'block';
+
                 await fetchFiles();
                 let currentFile = null;
                 let i = currentIndex;
@@ -374,6 +406,7 @@ async function fetchVideoLink(fileId) {
                 }
                 if (!currentFile) {
                     alert('לא נמצאו קבצי מדיה.');
+                    spinner.style.display = 'none'; // הסתרת הספינר אם לא נמצאו קבצים
                     return;
                 }
                 if (currentFile.Type === 'Audio') {
@@ -387,7 +420,9 @@ async function fetchVideoLink(fileId) {
                         }
                     });
                 }
-                showModal(currentFile.Type, currentFile.PreviewSrc, currentFile.Name);
+
+                // הסתרת הספינר לאחר פתיחת המודל
+                spinner.style.display = 'none';
             }
             actionGroup.appendChild(playButtonWrapper);
         }
