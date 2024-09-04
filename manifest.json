@@ -10,12 +10,6 @@
         "https://api.jumbomail.me/*",
         "https://www.jumbomail.me/*"
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "action": {
-        "default_icon": {}
-    },
     "content_scripts": [
         {
             "matches": [

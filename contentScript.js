@@ -285,9 +285,12 @@ const showModal = (type, src, fileName) => {
 
 async function fetchVideoLink(fileId) {
     try {
-        const response = await chrome.runtime.sendMessage({
-            action: 'fetchVideoLink',
-            body: {
+        const response = await fetch('https://api.jumbomail.me/mails/ReactGetDownloadLink', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 "folderPathId": null,
                 "encryptedMailId": mailId,
                 "fileList": fileId,
@@ -297,14 +300,15 @@ async function fetchVideoLink(fileId) {
                 "culture": "en",
                 "isProxySuccess": true,
                 "uid": null
-            }
+            })
         });
 
-        if (response.error) {
-            throw new Error(response.error);
+        if (!response.ok) {
+            throw new Error('Failed to fetch video link');
         }
 
-        return response.link;
+        const data = await response.text();
+        return data.trim().replace(/^"|"$/g, '');
     } catch (error) {
         console.error('שגיאה בקבלת קישור הווידאו:', error);
         return null;
@@ -330,36 +334,31 @@ async function fetchVideoLink(fileId) {
         }
 
         try {
-            // Send message to background.js to fetch files
-            const response = await new Promise((resolve, reject) => {
-                chrome.runtime.sendMessage({
-                    action: 'fetchFiles',
-                    body: {
-                        "encryptedMailId": mailId,
-                        "page": 1,
-                        "perPage": 100,
-                        "sortAsc": true,
-                        "sortBy": "Name",
-                        "folderId": null,
-                        "password": null,
-                        "search": "",
-                        "contributorsFilter": [],
-                        "foldersStructured": false
-                    }
-                }, (response) => {
-                    if (chrome.runtime.lastError) {
-                        reject(chrome.runtime.lastError);
-                    } else {
-                        resolve(response);
-                    }
-                });
+            const response = await fetch('https://api.jumbomail.me/Mails/ReactGetMailFiles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "encryptedMailId": mailId,
+                    "page": 1,
+                    "perPage": 100,
+                    "sortAsc": true,
+                    "sortBy": "Name",
+                    "folderId": null,
+                    "password": null,
+                    "search": "",
+                    "contributorsFilter": [],
+                    "foldersStructured": false
+                })
             });
 
-            if (response.error) {
-                throw new Error(response.error);
+            if (!response.ok) {
+                throw new Error('Failed to fetch files');
             }
 
-            filesData = response.files; // Store files data globally
+            const data = await response.json();
+            filesData = data.files; // Store files data globally
             return true;
         } catch (error) {
             console.error('שגיאה בקבלת הקבצים:', error);
