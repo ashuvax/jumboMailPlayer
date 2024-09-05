@@ -1,11 +1,8 @@
 {
     "manifest_version": 3,
     "name": "JumboMail Player",
-    "version": "2.2",
+    "version": "2.3",
     "description": "תוסף לניגון והורדת קבצים מ-JumboMail.",
-    "permissions": [
-        "activeTab"
-    ],
     "host_permissions": [
         "https://api.jumbomail.me/*",
         "https://www.jumbomail.me/*"
