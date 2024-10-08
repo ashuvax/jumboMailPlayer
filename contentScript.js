@@ -2,6 +2,7 @@ let filesData = {}; // משתנה גלובלי לאחסון כל נתוני הק
 let currentIndex = 0; // משתנה גלובלי לאחסון האינדקס הנוכחי
 let mailId = ''; // משתנה גלובלי לאחסון המזהה של המייל
 let modalLoad = false; // משתנה גלובלי לאחסון האם המודל נטען
+let pictureInPicture = false; // משתנה גלובלי לאחסון האם יש תמונה בתמונה
 
 const closeModal = () => {
     const modal = document.getElementById('mediaModal');
@@ -11,6 +12,11 @@ const closeModal = () => {
     if (!mediaContainer) return;
     mediaContainer.innerHTML = '';
     modalLoad = false;
+
+    if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler('nexttrack', null);
+        navigator.mediaSession.setActionHandler('previoustrack', null);
+    }
 }
 
 // Close the modal if clicking outside of the modal content
@@ -30,16 +36,6 @@ const saveVolume = (volume) => {
 const getVolume = () => {
     return localStorage.getItem('mediaVolume') || 1; // Default volume is 1 (100%)
 }
-// Add event listeners for keyboard navigation
-window.addEventListener('keydown', (event) => {
-    if ((event.key === 'ArrowRight' || event.key === 'MediaTrackNext')
-        && hasNext()) {
-        playNext();
-    } else if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious'
-        && hasPrev()) {
-        playPrev();
-    }
-});
 
 function playNext() {
     let nextIndex = currentIndex + 1;
@@ -260,6 +256,8 @@ const showModal = (type, src, fileName) => {
         alert('סוג מדיה לא נתמך.');
         return;
     }
+    // שינוי שם הקובץ בהורדה
+    mediaElement.title = fileName;
 
     // Set the volume from LocalStorage
     mediaElement.volume = getVolume();
@@ -269,18 +267,44 @@ const showModal = (type, src, fileName) => {
         saveVolume(mediaElement.volume);
     };
 
+    mediaElement.addEventListener('enterpictureinpicture', () => {
+        pictureInPicture = true;
+    });
+
+    mediaElement.addEventListener('leavepictureinpicture', () => {
+        pictureInPicture = false;
+    });
+
     mediaElement.onended = playNext; // Attach the playNext function when media ends
+
+    mediaElement.onplaying = () => {
+        // בדיקה אם מופעל תמונה בתוך תמונה
+        if (pictureInPicture) {
+            mediaElement.requestPictureInPicture();
+        }
+    }
 
     mediaContainer.appendChild(mediaElement);
     modal.style.display = 'flex'; // Show the modal
 
     // Set click events for next and previous buttons
-    nextButton.onclick = playNext;
-    prevButton.onclick = playPrev;
+    nextButton.onclick = () => {
+        mediaElement.pause();
+        playNext();
+    }
+    prevButton.onclick = () => {
+        mediaElement.pause();
+        playPrev();
+    }
 
     // Enable or disable buttons based on the current index
     nextButton.disabled = !hasNext();
     prevButton.disabled = !hasPrev();
+
+    if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler('nexttrack', hasNext() ? playNext : null);
+        navigator.mediaSession.setActionHandler('previoustrack', hasPrev() ? playPrev : null);
+    }
 }
 
 async function fetchVideoLink(fileId) {
