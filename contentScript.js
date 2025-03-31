@@ -3,6 +3,7 @@ let currentIndex = 0; // משתנה גלובלי לאחסון האינדקס ה�
 let mailId = ''; // משתנה גלובלי לאחסון המזהה של המייל
 let modalLoad = false; // משתנה גלובלי לאחסון האם המודל נטען
 let pictureInPicture = false; // משתנה גלובלי לאחסון האם יש תמונה בתמונה
+let isFullScreen = false; // משתנה גלובלי לאחסון מצב מסך מלא
 
 const closeModal = () => {
     const modal = document.getElementById('mediaModal');
@@ -252,6 +253,20 @@ const showModal = (type, src, fileName) => {
         mediaElement.controls = true;
         mediaElement.autoplay = true; // Enable autoplay
         mediaElement.src = src;
+
+        // מעקב אחר שינויים במצב מסך מלא
+        mediaElement.addEventListener('fullscreenchange', () => {
+            isFullScreen = document.fullscreenElement !== null;
+        });
+
+        // אם היה במצב מסך מלא קודם, נכנס למסך מלא
+        if (isFullScreen) {
+            mediaElement.addEventListener('loadedmetadata', () => {
+                if (mediaElement.requestFullscreen) {
+                    mediaElement.requestFullscreen();
+                }
+            });
+        }
     } else {
         alert('סוג מדיה לא נתמך.');
         return;

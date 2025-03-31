@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "JumboMail Player",
-    "version": "2.5.0",
+    "version": "2.6.1",
     "description": "תוסף לניגון והורדת קבצים מ-JumboMail.",
     "host_permissions": [
         "https://api.jumbomail.me/*",
@@ -10,7 +10,8 @@
     "content_scripts": [
         {
             "matches": [
-                "https://www.jumbomail.me/l/*/gallery/*"
+                "https://www.jumbomail.me/l/*/gallery/*",
+                "https://www.jumbomail.me/*/gallery/*"
             ],
             "js": [
                 "contentScript.js"
